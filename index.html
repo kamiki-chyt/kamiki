@@ -174,7 +174,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        /* モーダル共通 */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -256,7 +255,6 @@
             font-size: 14px;
         }
 
-        /* 管理画面用ワイドモーダル */
         .modal-wide {
             max-width: 600px;
             max-height: 85vh;
@@ -398,24 +396,38 @@
         <div class="modal modal-wide">
             <h2>登録リンク一覧</h2>
             <p>現在microCMSに登録されているすべての短縮リンクです。</p>
-            <div class="link-list-container" id="linkListContainer">
-                <!-- ここにリストが動的に入ります -->
-            </div>
+            <div class="link-list-container" id="linkListContainer"></div>
             <button class="btn btn-secondary" onclick="closeAdminModal()">閉じる</button>
         </div>
     </div>
 
-    <!-- コピー完了トースト通知 -->
     <div class="toast" id="toast">短縮リンクをコピーしました！</div>
 
     <script>
-        // ★ご自身のmicroCMSの設定に書き換えてください★
-        const MICROCMS_SERVICE_ID = 'YOUR_SERVICE_ID'; 
-        const MICROCMS_API_KEY = 'YOUR_API_KEY';       
-
+        // サービスドメインを固定定義
+        const MICROCMS_SERVICE_ID = 'kamiki-links';
         const CORRECT_PIN = '12040310';
 
+        // GitHub上の api_key.txt からAPIキーを自動取得
+        async function fetchApiKey() {
+            try {
+                const res = await fetch('api_key.txt');
+                if (!res.ok) throw new Error('Key file not found');
+                const key = await res.text();
+                return key.trim();
+            } catch (err) {
+                console.error('APIキーの取得に失敗しました。api_key.txtを配置してください。', err);
+                return null;
+            }
+        }
+
         async function init() {
+            const apiKey = await fetchApiKey();
+            if (!apiKey) {
+                showNotFoundUI();
+                return;
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const slug = urlParams.get('v');
 
@@ -427,7 +439,7 @@
             try {
                 const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
                 const res = await fetch(endpoint, {
-                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
+                    headers: { 'X-MICROCMS-API-KEY': apiKey }
                 });
 
                 if (!res.ok) throw new Error('API Error');
@@ -487,7 +499,6 @@
             `;
         }
 
-        // 秘密のトリガー（2秒間で5回タップ）
         let tapCount = 0;
         let firstTapTime = 0;
 
@@ -510,7 +521,6 @@
             });
         }
 
-        // ID入力モーダル
         function openModal() {
             document.getElementById('modalOverlay').classList.add('active');
             document.getElementById('idInput').focus();
@@ -529,7 +539,6 @@
             }
         }
 
-        // PIN入力モーダル
         function openPinModal() {
             document.getElementById('pinModalOverlay').classList.add('active');
             document.getElementById('pinInput').value = '';
@@ -552,17 +561,21 @@
             }
         }
 
-        // 管理者用リンク一覧の取得・表示
         async function fetchAndShowLinks() {
             const container = document.getElementById('linkListContainer');
             container.innerHTML = '<p style="text-align:center; padding: 20px;">読み込み中...</p>';
             document.getElementById('adminModalOverlay').classList.add('active');
 
+            const apiKey = await fetchApiKey();
+            if (!apiKey) {
+                container.innerHTML = '<p style="text-align:center; padding: 20px; color: #dc2626;">APIキーが見つかりません。</p>';
+                return;
+            }
+
             try {
-                // 最大100件まで取得
                 const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?limit=100`;
                 const res = await fetch(endpoint, {
-                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
+                    headers: { 'X-MICROCMS-API-KEY': apiKey }
                 });
 
                 if (!res.ok) throw new Error('API Error');
@@ -614,7 +627,6 @@
             navigator.clipboard.writeText(text).then(() => {
                 showToast();
             }).catch(err => {
-                // フォールバック
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
                 document.body.appendChild(textarea);
@@ -641,7 +653,6 @@
                       .replace(/'/g, '&#039;');
         }
 
-        // Enterキー対応
         document.getElementById('idInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') submitID();
         });
