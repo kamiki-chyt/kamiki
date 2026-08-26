@@ -3,83 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リダイレクト中...</title>
+    <title>神木チャンネル 短縮リンク</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f7;
-            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
-        .container {
+
+        /* 背景のソフトなアニメーション装飾 */
+        .bg-blob {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, rgba(249, 115, 22, 0.08) 100%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: float 10s ease-in-out infinite alternate;
+        }
+
+        .bg-blob-2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            animation: float2 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-100px, -100px) scale(1); }
+            100% { transform: translate(100px, 100px) scale(1.1); }
+        }
+
+        @keyframes float2 {
+            0% { transform: translate(100px, 100px) scale(1.1); }
+            100% { transform: translate(-100px, -100px) scale(1); }
+        }
+
+        /* メインカード */
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+            padding: 48px 36px;
+            max-width: 480px;
+            width: 100%;
             text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        .spinner {
-            border: 4px solid rgba(0,0,0,0.1);
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .icon-wrapper {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 12px 24px rgba(255, 0, 0, 0.25);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 12px 24px rgba(255, 0, 0, 0.25); }
+            50% { transform: scale(1.05); box-shadow: 0 18px 32px rgba(255, 0, 0, 0.35); }
+        }
+
+        .icon-wrapper svg {
             width: 36px;
             height: 36px;
-            border-radius: 50%;
-            border-left-color: #09f;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            fill: #ffffff;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            font-size: 15px;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px 24px;
+            background: #0f172a;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="spinner" id="spinner"></div>
-        <p id="status">転送先を確認中...</p>
+
+    <div class="bg-blob"></div>
+    <div class="bg-blob-2"></div>
+
+    <div class="card">
+        <div class="icon-wrapper">
+            <svg viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+        </div>
+        <h1>このリンクは神木チャンネルのみで使用している短縮リンクです</h1>
+        <p>短縮IDを指定せずにアクセスされたか、指定されたリンクが存在しない可能性があります。</p>
+        <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
+            神木チャンネルを見る
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
     </div>
 
-    <script>
-        // ★ご自身のmicroCMSの設定に書き換えてください★
-        const MICROCMS_SERVICE_ID = 'YOUR_SERVICE_ID'; // 例: 'kamiki-app'
-        const MICROCMS_API_KEY = 'YOUR_API_KEY';       // GET権限のあるAPIキー
-
-        async function redirect() {
-            // パスから末尾のslug（短縮ID）を抽出（例: /yt1 -> 'yt1'）
-            const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
-            const slug = pathParts[pathParts.length - 1];
-
-            if (!slug) {
-                document.getElementById('status').innerText = 'URLが指定されていません。';
-                document.getElementById('spinner').style.display = 'none';
-                return;
-            }
-
-            try {
-                // microCMSから一致するslugのデータを取り出す
-                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
-                const res = await fetch(endpoint, {
-                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
-                });
-
-                if (!res.ok) throw new Error('API Error');
-
-                const data = await res.json();
-
-                if (data.contents && data.contents.length > 0 && data.contents[0].destination) {
-                    // 登録されたURLへ自動転送
-                    window.location.replace(data.contents[0].destination);
-                } else {
-                    document.getElementById('status').innerText = '指定された短縮URLは見つかりませんでした。';
-                    document.getElementById('spinner').style.display = 'none';
-                }
-            } catch (err) {
-                document.getElementById('status').innerText = 'エラーが発生しました。時間をおいて再試行してください。';
-                document.getElementById('spinner').style.display = 'none';
-            }
-        }
-
-        redirect();
-    </script>
 </body>
 </html>
