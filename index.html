@@ -24,7 +24,6 @@
             position: relative;
         }
 
-        /* 背景のソフトなアニメーション装飾 */
         .bg-blob {
             position: absolute;
             width: 400px;
@@ -36,28 +35,11 @@
             animation: float 10s ease-in-out infinite alternate;
         }
 
-        .bg-blob-2 {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
-            border-radius: 50%;
-            filter: blur(60px);
-            z-index: 0;
-            animation: float2 12s ease-in-out infinite alternate;
-        }
-
         @keyframes float {
             0% { transform: translate(-100px, -100px) scale(1); }
             100% { transform: translate(100px, 100px) scale(1.1); }
         }
 
-        @keyframes float2 {
-            0% { transform: translate(100px, 100px) scale(1.1); }
-            100% { transform: translate(-100px, -100px) scale(1); }
-        }
-
-        /* メインカード */
         .card {
             position: relative;
             z-index: 1;
@@ -77,12 +59,32 @@
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px) scale(0.96);
+                transform: translateY(20px) scale(0.98);
             }
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
+        }
+
+        .spinner-wrapper {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+        }
+
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(226, 232, 240, 0.8);
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .icon-wrapper {
@@ -99,8 +101,8 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 12px 24px rgba(255, 0, 0, 0.25); }
-            50% { transform: scale(1.05); box-shadow: 0 18px 32px rgba(255, 0, 0, 0.35); }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .icon-wrapper svg {
@@ -122,7 +124,6 @@
             font-size: 15px;
             color: #64748b;
             line-height: 1.6;
-            margin-bottom: 32px;
         }
 
         .btn {
@@ -132,6 +133,7 @@
             gap: 8px;
             width: 100%;
             padding: 16px 24px;
+            margin-top: 24px;
             background: #0f172a;
             color: #ffffff;
             text-decoration: none;
@@ -147,33 +149,104 @@
             transform: translateY(-2px);
             box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
         }
-
-        .btn:active {
-            transform: translateY(0);
-        }
     </style>
 </head>
 <body>
 
     <div class="bg-blob"></div>
-    <div class="bg-blob-2"></div>
 
-    <div class="card">
-        <div class="icon-wrapper">
-            <svg viewBox="0 0 24 24">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
+    <div class="card" id="card">
+        <div class="spinner-wrapper" id="spinner-container">
+            <div class="spinner"></div>
         </div>
-        <h1>このリンクは神木チャンネルのみで使用している短縮リンクです</h1>
-        <p>短縮IDを指定せずにアクセスされたか、指定されたリンクが存在しない可能性があります。</p>
-        <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
-            神木チャンネルを見る
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </a>
+        <h1 id="title">転送先を確認中...</h1>
+        <p id="status">しばらくお待ちください。</p>
+        <div id="action-area"></div>
     </div>
 
+    <script>
+        // ★ご自身のmicroCMSの設定に書き換えてください★
+        const MICROCMS_SERVICE_ID = 'YOUR_SERVICE_ID'; 
+        const MICROCMS_API_KEY = 'YOUR_API_KEY';       
+
+        async function init() {
+            // URLのクエリパラメータ（例: ?v=yt1）を取得
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('v');
+
+            // ① パラメータ（?v=...）がない場合、または空の場合
+            if (!slug) {
+                showTopPageUI();
+                return;
+            }
+
+            // ② パラメータがある場合、microCMSに問い合わせて転送
+            try {
+                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
+                const res = await fetch(endpoint, {
+                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
+                });
+
+                if (!res.ok) throw new Error('API Error');
+
+                const data = await res.json();
+
+                if (data.contents && data.contents.length > 0 && data.contents[0].destination) {
+                    document.getElementById('title').innerText = 'リダイレクトしています...';
+                    window.location.replace(data.contents[0].destination);
+                } else {
+                    showNotFoundUI();
+                }
+            } catch (err) {
+                showNotFoundUI();
+            }
+        }
+
+        // トップページ（パラメータなし）の表示
+        function showTopPageUI() {
+            document.getElementById('spinner-container').outerHTML = `
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </div>
+            `;
+            document.getElementById('title').innerText = 'このリンクは神木チャンネルのみで使用している短縮リンクです';
+            document.getElementById('status').innerText = '短縮IDが指定されていないか、直接アクセスされています。';
+            document.getElementById('action-area').innerHTML = `
+                <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
+                    神木チャンネルを見る
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            `;
+        }
+
+        // パラメータはあるが、microCMSに該当データがなかった場合
+        function showNotFoundUI() {
+            document.getElementById('spinner-container').outerHTML = `
+                <div class="icon-wrapper">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                </div>
+            `;
+            document.getElementById('title').innerText = '指定された短縮リンクは見つかりませんでした';
+            document.getElementById('status').innerText = 'URLが間違っているか、すでに削除された可能性があります。';
+            document.getElementById('action-area').innerHTML = `
+                <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
+                    神木チャンネルを見る
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            `;
+        }
+
+        init();
+    </script>
 </body>
 </html>
