@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リダイレクト中...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f7;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <p id="status">転送先を確認中...</p>
+    </div>
+
+    <script>
+        // ★ご自身のmicroCMSの設定に書き換えてください★
+        const MICROCMS_SERVICE_ID = 'YOUR_SERVICE_ID'; // 例: 'kamiki-app'
+        const MICROCMS_API_KEY = 'YOUR_API_KEY';       // GET権限のあるAPIキー
+
+        async function redirect() {
+            // パスから末尾のslug（短縮ID）を抽出（例: /yt1 -> 'yt1'）
+            const pathParts = window.location.pathname.split('/').filter(p => p.length > 0);
+            const slug = pathParts[pathParts.length - 1];
+
+            if (!slug) {
+                document.getElementById('status').innerText = 'URLが指定されていません。';
+                document.getElementById('spinner').style.display = 'none';
+                return;
+            }
+
+            try {
+                // microCMSから一致するslugのデータを取り出す
+                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
+                const res = await fetch(endpoint, {
+                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
+                });
+
+                if (!res.ok) throw new Error('API Error');
+
+                const data = await res.json();
+
+                if (data.contents && data.contents.length > 0 && data.contents[0].destination) {
+                    // 登録されたURLへ自動転送
+                    window.location.replace(data.contents[0].destination);
+                } else {
+                    document.getElementById('status').innerText = '指定された短縮URLは見つかりませんでした。';
+                    document.getElementById('spinner').style.display = 'none';
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = 'エラーが発生しました。時間をおいて再試行してください。';
+                document.getElementById('spinner').style.display = 'none';
+            }
+        }
+
+        redirect();
+    </script>
+</body>
+</html>
