@@ -20,7 +20,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -57,14 +57,8 @@
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .spinner-wrapper {
@@ -98,6 +92,14 @@
             margin: 0 auto 24px;
             box-shadow: 0 12px 24px rgba(255, 0, 0, 0.25);
             animation: pulse 3s ease-in-out infinite;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.1s ease;
+        }
+
+        .icon-wrapper:active {
+            transform: scale(0.95);
         }
 
         @keyframes pulse {
@@ -109,6 +111,7 @@
             width: 36px;
             height: 36px;
             fill: #ffffff;
+            pointer-events: none;
         }
 
         h1 {
@@ -126,6 +129,13 @@
             line-height: 1.6;
         }
 
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -133,13 +143,14 @@
             gap: 8px;
             width: 100%;
             padding: 16px 24px;
-            margin-top: 24px;
             background: #0f172a;
             color: #ffffff;
             text-decoration: none;
             font-weight: 600;
             font-size: 15px;
             border-radius: 16px;
+            border: none;
+            cursor: pointer;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
         }
@@ -148,6 +159,198 @@
             background: #2563eb;
             transform: translateY(-2px);
             box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-secondary {
+            background: rgba(241, 245, 249, 0.8);
+            color: #334155;
+            box-shadow: none;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* モーダル共通 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px 28px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: left;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .modal p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            outline: none;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+
+        .input-box:focus {
+            border-color: #2563eb;
+        }
+
+        .modal-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn-group .btn {
+            padding: 14px 20px;
+            font-size: 14px;
+        }
+
+        /* 管理画面用ワイドモーダル */
+        .modal-wide {
+            max-width: 600px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .link-list-container {
+            overflow-y: auto;
+            max-height: 50vh;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 4px;
+        }
+
+        .link-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .link-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .link-slug {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 15px;
+        }
+
+        .link-explain {
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .link-dest {
+            font-size: 12px;
+            color: #64748b;
+            word-break: break-all;
+        }
+
+        .link-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .copy-btn {
+            background: #0f172a;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #2563eb;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #0f172a;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 200;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
@@ -164,23 +367,63 @@
         <div id="action-area"></div>
     </div>
 
+    <!-- ID入力用モーダル -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h2>短縮IDを入力</h2>
+            <p>移動したい短縮ID（例: yt1）を入力してください。</p>
+            <input type="text" class="input-box" id="idInput" placeholder="短縮IDを入力..." autocomplete="off">
+            <div class="modal-btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+                <button class="btn" onclick="submitID()">移動する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN入力用モーダル -->
+    <div class="modal-overlay" id="pinModalOverlay">
+        <div class="modal">
+            <h2>管理用PINコード入力</h2>
+            <p>登録されたリンク一覧を見るにはPINを入力してください。</p>
+            <input type="password" class="input-box" id="pinInput" placeholder="PINコード..." autocomplete="off" maxlength="8">
+            <div class="modal-btn-group">
+                <button class="btn btn-secondary" onclick="closePinModal()">キャンセル</button>
+                <button class="btn" onclick="verifyPin()">認証する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理者用リスト表示モーダル -->
+    <div class="modal-overlay" id="adminModalOverlay">
+        <div class="modal modal-wide">
+            <h2>登録リンク一覧</h2>
+            <p>現在microCMSに登録されているすべての短縮リンクです。</p>
+            <div class="link-list-container" id="linkListContainer">
+                <!-- ここにリストが動的に入ります -->
+            </div>
+            <button class="btn btn-secondary" onclick="closeAdminModal()">閉じる</button>
+        </div>
+    </div>
+
+    <!-- コピー完了トースト通知 -->
+    <div class="toast" id="toast">短縮リンクをコピーしました！</div>
+
     <script>
         // ★ご自身のmicroCMSの設定に書き換えてください★
         const MICROCMS_SERVICE_ID = 'YOUR_SERVICE_ID'; 
         const MICROCMS_API_KEY = 'YOUR_API_KEY';       
 
+        const CORRECT_PIN = '12040310';
+
         async function init() {
-            // URLのクエリパラメータ（例: ?v=yt1）を取得
             const urlParams = new URLSearchParams(window.location.search);
             const slug = urlParams.get('v');
 
-            // ① パラメータ（?v=...）がない場合、または空の場合
             if (!slug) {
                 showTopPageUI();
                 return;
             }
 
-            // ② パラメータがある場合、microCMSに問い合わせて転送
             try {
                 const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
                 const res = await fetch(endpoint, {
@@ -191,9 +434,9 @@
 
                 const data = await res.json();
 
-                if (data.contents && data.contents.length > 0 && data.contents[0].destination) {
+                if (data.contents && data.contents.length > 0 && data.contents[0].destinat) {
                     document.getElementById('title').innerText = 'リダイレクトしています...';
-                    window.location.replace(data.contents[0].destination);
+                    window.location.replace(data.contents[0].destinat);
                 } else {
                     showNotFoundUI();
                 }
@@ -202,49 +445,209 @@
             }
         }
 
-        // トップページ（パラメータなし）の表示
         function showTopPageUI() {
+            renderMainCard(
+                '<div>このリンクは神木チャンネルのみで使用している短縮リンクです</div>',
+                '短縮IDが指定されていないか、直接アクセスされています。'
+            );
+            setupSecretTrigger();
+        }
+
+        function showNotFoundUI() {
+            renderMainCard(
+                '指定された短縮リンクは見つかりませんでした',
+                'URLが間違っているか、すでに削除された可能性があります。'
+            );
+            setupSecretTrigger();
+        }
+
+        function renderMainCard(titleText, statusText) {
             document.getElementById('spinner-container').outerHTML = `
-                <div class="icon-wrapper">
+                <div class="icon-wrapper" id="ytIcon">
                     <svg viewBox="0 0 24 24">
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                     </svg>
                 </div>
             `;
-            document.getElementById('title').innerText = 'このリンクは神木チャンネルのみで使用している短縮リンクです';
-            document.getElementById('status').innerText = '短縮IDが指定されていないか、直接アクセスされています。';
+            document.getElementById('title').innerHTML = titleText;
+            document.getElementById('status').innerText = statusText;
             document.getElementById('action-area').innerHTML = `
-                <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
-                    神木チャンネルを見る
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
+                <div class="btn-group">
+                    <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
+                        神木チャンネルを見る
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                    <button class="btn btn-secondary" onclick="openModal()">
+                        IDを入力して移動
+                    </button>
+                </div>
             `;
         }
 
-        // パラメータはあるが、microCMSに該当データがなかった場合
-        function showNotFoundUI() {
-            document.getElementById('spinner-container').outerHTML = `
-                <div class="icon-wrapper">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                </div>
-            `;
-            document.getElementById('title').innerText = '指定された短縮リンクは見つかりませんでした';
-            document.getElementById('status').innerText = 'URLが間違っているか、すでに削除された可能性があります。';
-            document.getElementById('action-area').innerHTML = `
-                <a href="https://youtube.com/@kamiki-ch?si=QtYWyEDAbs0-nz4a" class="btn" target="_blank" rel="noopener noreferrer">
-                    神木チャンネルを見る
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
-            `;
+        // 秘密のトリガー（2秒間で5回タップ）
+        let tapCount = 0;
+        let firstTapTime = 0;
+
+        function setupSecretTrigger() {
+            const icon = document.getElementById('ytIcon');
+            if (!icon) return;
+
+            icon.addEventListener('click', () => {
+                const now = Date.now();
+                if (tapCount === 0 || (now - firstTapTime > 2000)) {
+                    tapCount = 1;
+                    firstTapTime = now;
+                } else {
+                    tapCount++;
+                    if (tapCount === 5) {
+                        tapCount = 0;
+                        openPinModal();
+                    }
+                }
+            });
         }
+
+        // ID入力モーダル
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('idInput').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById('idInput').value = '';
+        }
+
+        function submitID() {
+            const idValue = document.getElementById('idInput').value.trim();
+            if (idValue) {
+                const currentPath = window.location.pathname;
+                window.location.href = `${currentPath}?v=${encodeURIComponent(idValue)}`;
+            }
+        }
+
+        // PIN入力モーダル
+        function openPinModal() {
+            document.getElementById('pinModalOverlay').classList.add('active');
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinInput').focus();
+        }
+
+        function closePinModal() {
+            document.getElementById('pinModalOverlay').classList.remove('active');
+            document.getElementById('pinInput').value = '';
+        }
+
+        async function verifyPin() {
+            const pin = document.getElementById('pinInput').value;
+            if (pin === CORRECT_PIN) {
+                closePinModal();
+                await fetchAndShowLinks();
+            } else {
+                alert('PINコードが違います');
+                document.getElementById('pinInput').value = '';
+            }
+        }
+
+        // 管理者用リンク一覧の取得・表示
+        async function fetchAndShowLinks() {
+            const container = document.getElementById('linkListContainer');
+            container.innerHTML = '<p style="text-align:center; padding: 20px;">読み込み中...</p>';
+            document.getElementById('adminModalOverlay').classList.add('active');
+
+            try {
+                // 最大100件まで取得
+                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?limit=100`;
+                const res = await fetch(endpoint, {
+                    headers: { 'X-MICROCMS-API-KEY': MICROCMS_API_KEY }
+                });
+
+                if (!res.ok) throw new Error('API Error');
+
+                const data = await res.json();
+                const contents = data.contents || [];
+
+                if (contents.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; padding: 20px;">登録されているリンクはありません。</p>';
+                    return;
+                }
+
+                let html = '';
+                const baseUrl = window.location.origin + window.location.pathname;
+
+                contents.forEach(item => {
+                    const slug = item.slug || '';
+                    const explain = item.explain || '（説明なし）';
+                    const destinat = item.destinat || '';
+                    const shortLink = `${baseUrl}?v=${slug}`;
+
+                    html += `
+                        <div class="link-item">
+                            <div class="link-item-header">
+                                <span class="link-slug">ID: ${escapeHtml(slug)}</span>
+                            </div>
+                            <div class="link-explain">${escapeHtml(explain)}</div>
+                            <div class="link-dest"><strong>転送先:</strong> ${escapeHtml(destinat)}</div>
+                            <div class="link-item-footer">
+                                <span style="font-size:11px; color:#94a3b8; word-break:break-all; max-width:65%;">${escapeHtml(shortLink)}</span>
+                                <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(shortLink)}')">短縮リンクをコピー</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+            } catch (err) {
+                container.innerHTML = '<p style="text-align:center; padding: 20px; color: #dc2626;">データの取得に失敗しました。</p>';
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModalOverlay').classList.remove('active');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            }).catch(err => {
+                // フォールバック
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#039;');
+        }
+
+        // Enterキー対応
+        document.getElementById('idInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') submitID();
+        });
+        document.getElementById('pinInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyPin();
+        });
 
         init();
     </script>
