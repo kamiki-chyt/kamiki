@@ -404,19 +404,18 @@
     <div class="toast" id="toast">短縮リンクをコピーしました！</div>
 
     <script>
-        // サービスドメインを固定定義
         const MICROCMS_SERVICE_ID = 'kamiki-links';
         const CORRECT_PIN = '12040310';
 
-        // GitHub上の api_key.txt からAPIキーを自動取得
+        // 改行や余分な空白を完全に削除して取得
         async function fetchApiKey() {
             try {
-                const res = await fetch('api_key.txt');
+                const res = await fetch('api_key.txt', { cache: 'no-store' });
                 if (!res.ok) throw new Error('Key file not found');
-                const key = await res.text();
-                return key.trim();
+                const text = await res.text();
+                return text.replace(/\s+/g, ''); // 全ての改行・スペースを除去
             } catch (err) {
-                console.error('APIキーの取得に失敗しました。api_key.txtを配置してください。', err);
+                console.error('APIキーの取得に失敗しました。', err);
                 return null;
             }
         }
@@ -437,7 +436,7 @@
             }
 
             try {
-                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${slug}`;
+                const endpoint = `https://${MICROCMS_SERVICE_ID}.microcms.io/api/v1/links?filters=slug[equals]${encodeURIComponent(slug)}`;
                 const res = await fetch(endpoint, {
                     headers: { 'X-MICROCMS-API-KEY': apiKey }
                 });
@@ -453,6 +452,7 @@
                     showNotFoundUI();
                 }
             } catch (err) {
+                console.error(err);
                 showNotFoundUI();
             }
         }
